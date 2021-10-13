@@ -1,7 +1,7 @@
 ﻿####################################
 ### VARIABLES ########################
 #$WorkingDIR = 'G:\.CloneHero\Songs\~ActiveSongs~'
-$WorkingDir = '.\'
+$WorkingDir = "$($PWD)"
 # Read settings from file...
 $SettingsFile = Get-Content "$($PSScriptRoot)\settings.txt"
 $SongsDIR = "$($SettingsFile[0])" #| out-host
@@ -14,6 +14,8 @@ $activePacks = Get-Content "$($SettingsFile[2])" #| out-host
 #####################################
 
 
+# Display choices of available games/song packs to the user,
+# Then move all songs from the chosen pack to CH Songs directory.
 function ActivateSongPack()
 {
     $GHPacks = Get-Content "G:\.CloneHero\Songs\Guitar Hero\songpacks.txt"
@@ -44,7 +46,11 @@ function ActivateSongPack()
     write-host "[Package Found!] " -ForegroundColor Green -BackgroundColor Black -NoNewline
     write-host "$($name)" -BackgroundColor Black
     
-    write-host "Moving all -$($pkSongs.Count)- songs from $($gName)\$($name) Song Pack into Clone Hero Songs directory..."
+    write-host "Moving " -NoNewline
+    write-host "$($pkSongs.Count)" -ForegroundColor Green -NoNewline
+    write-host " songs from the " -NoNewline
+    write-host $($gName)\$($name) -ForegroundColor Red -NoNewline
+    write-host " Song Pack into Clone Hero Songs directory..."
     ForEach($pkSong in $pkSongs)
     {
         $actSongName = $pkSong | Split-Path -Leaf
@@ -111,10 +117,7 @@ function Get-PackSongsList()
     write-host $WorkingDir #-BackgroundColor Black
     pause
     
-    
-    ####################################
-    ### MAIN LOOP ########################
-    $Folders = Get-ChildItem "$WorkingDir" -Directory -Name #| Select-Object -Property PSPath | Export-Csv "songs.csv"
+    $Folders = Get-ChildItem "$($PWD)" -Directory -Name #| Select-Object -Property PSPath | Export-Csv "songs.csv"
     ForEach($Folder in $Folders)
     {
         Write-Host "Adding $($Folder) to CSV file..."
@@ -126,7 +129,7 @@ function Get-PackSongsList()
         $pathSong = "$($fParent)\$($fFile)"
         #write-host "..\$($fParent)\$($fFile)" | out-file packsongs.txt -Append
         out-file -InputObject $pathSong -FilePath packsongs.txt -Append
-        Export-Csv -InputObject $path2Song -Path ".\songs.csv" -Append -NoTypeInformation
+        Export-Csv -InputObject "$($path2Song.ToString())" - -Path "songs.csv" -Append -NoTypeInformation
     }
     #get total number of songs in the pack...
     $numSongs = ls -directory -name

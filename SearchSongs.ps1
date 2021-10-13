@@ -59,7 +59,7 @@ function SearchJson()
     $songsfound = Get-Content "G:\.CloneHero\Songs\songsFound.txt"
     out-file "G:\.CloneHero\Songs\~SearchResults~\$($input).json" -InputObject $songsfound -Force
     #$songsfound | format-list | out-host
-    write-host "Search found " -BackgroundColor Black -NoNewline
+    write-host "$(CHSM) Search found " -BackgroundColor Black -NoNewline
     write-host $songsfound.Count -ForegroundColor Red -BackgroundColor Black -NoNewline
     write-host " results, out of " -BackgroundColor Black -NoNewline
     write-host $SongsList.Count -ForegroundColor Red -BackgroundColor Black -NoNewline
@@ -99,7 +99,7 @@ function SongSearch(){
     $fixInput = Replace-SpecialChars -InputString $input
     out-file "G:\.CloneHero\Songs\~SearchResults~\$($fixInput).txt" -InputObject $songsfound -Force
     #$songsfound | format-list | out-host
-    write-host "Search found " -BackgroundColor Black -NoNewline
+    write-host "$(CHSM) Search found " -BackgroundColor Black -NoNewline
     write-host $songsfound.Count -ForegroundColor Red -BackgroundColor Black -NoNewline
     write-host " results, out of " -BackgroundColor Black -NoNewline
     write-host $SongsList.Count -ForegroundColor Red -BackgroundColor Black -NoNewline
