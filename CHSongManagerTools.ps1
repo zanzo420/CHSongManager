@@ -1,25 +1,20 @@
 ﻿####################################
 ### VARIABLES ########################
-#$WorkingDIR = 'G:\.CloneHero\Songs\~ActiveSongs~'
 $WorkingDir = "$($PWD)"
 # Read settings from file...
 $SettingsFile = Get-Content "$($PSScriptRoot)\settings.txt"
 $SongsDIR = "$($SettingsFile[0])" #| out-host
 $CHSongsDIR = "$($SettingsFile[1])" #| out-host
 $activePacks = Get-Content "$($SettingsFile[2])" #| out-host
-#$SongsDIR = 'G:\.CloneHero\Songs'
-#$CHSongsDIR = "G:\.CloneHero\Songs\~ActiveSongs~"
-#$CHSongsDIR = "$($env:APPDATA)\Clone Hero Launcher\gameFiles\Songs"
-#$activePacks = Get-Content "$($CHSongsDIR)\activepacks.txt"
 #####################################
 
 
-# Display choices of available games/song packs to the user,
-# Then move all songs from the chosen pack to CH Songs directory.
+#####################################
+### FUNCTIONS #########################
 function ActivateSongPack()
 {
-    $GHPacks = Get-Content "G:\.CloneHero\Songs\Guitar Hero\songpacks.txt"
-    $RBPacks = Get-Content "G:\.CloneHero\Songs\Rock Band\songpacks.txt"
+    $GHPacks = Get-Content "G:\.CloneHero\Songs\Guitar Hero\songpacks.txt" #Guitar Hero Song Packs
+    $RBPacks = Get-Content "G:\.CloneHero\Songs\Rock Band\songpacks.txt" #Rock Band Song Packs
 
     write-host "Enter the name of a game from the choices below..."
     write-host "[GAMES]" -BackgroundColor Black -ForegroundColor Red -NoNewline
@@ -62,7 +57,7 @@ function ActivateSongPack()
         $add2act = "$($CHSongsDIR)\$($gName)\$($name)\$($actSongName)" | out-file -FilePath "$($CHSongsDIR)\$($gName)\$($name)\activesongs.txt" -Append
         $pkSong | out-file -FilePath "$($CHSongsDIR)\$($gName)\$($name)\originalpaths.txt" -Append
     }
-}###END#FUNCTION###
+}##END##########ActivateSongPack##
 
 function RemoveAllSongPacks()
 {
@@ -107,8 +102,7 @@ function RemoveAllSongPacks()
     write-host "$($CHSongsDIR)\activepacks.txt" -BackgroundColor Black -ForegroundColor Yellow
     Clear-Content -Path "$($CHSongsDIR)\activepacks.txt" -WhatIf
     
-}## END FUNCTION ## RemoveAllSongPacks #####
-
+}##END##########RemoveAllSongPacks##
 
 function Get-PackSongsList()
 {
@@ -144,8 +138,7 @@ function Get-PackSongsList()
     cd ..
     pause
 
-}
-
+}##END##########Get-PackSongsList##
 
 function Get-SongPacksList()
 {
@@ -153,8 +146,7 @@ function Get-SongPacksList()
     Write-Host "Current Working Directory: " -ForegroundColor Green -NoNewline #-BackgroundColor Black
     write-host $WorkingDir #-BackgroundColor Black
     pause
-    ####################################
-    ### MAIN LOOP ########################
+
     $Folders = Get-ChildItem "$WorkingDir" -Directory -Name #| Select-Object -Property PSPath | Export-Csv "songs.csv"
     ForEach($Folder in $Folders)
     {
@@ -179,10 +171,11 @@ function Get-SongPacksList()
     write-host $numSongs.Count -ForegroundColor Green -BackgroundColor Black
     cd ..
     pause
-}
+}##END##########Get-SongPacksList##
 
-####################################
-### FUNCTIONS ########################
+
+#####################################
+### UI FUNCTIONS ########################
 function ShowBanner()
 {
     write-host ""
@@ -190,8 +183,7 @@ function ShowBanner()
     write-host 'CH Song Manager' -ForegroundColor DarkRed -NoNewline #-BackgroundColor Black
     write-host ' ]||' -ForegroundColor Red #-BackgroundColor Black
     write-host "          by Zanzo          `n" -ForegroundColor DarkRed #-BackgroundColor Black
-}
-
+}##END#######################UI#ShowBanner###
 function PrintSong($artist, $name, $album)
 {
     write-host "$($artist) " -ForegroundColor DarkRed -BackgroundColor Black -NoNewline
@@ -200,15 +192,13 @@ function PrintSong($artist, $name, $album)
     write-host "(" -ForegroundColor Red -BackgroundColor Black -NoNewline
     write-host "$($album)" -BackgroundColor Black -NoNewline
     write-host ")" -ForegroundColor Red -BackgroundColor Black -NoNewline
-}
-
+}##END#########################UI#PrintSong###
 function TextBar($txt)
 {
     write-host "!|[ " -ForegroundColor Red -BackgroundColor Black -NoNewline
     write-host $txt -ForegroundColor DarkRed -BackgroundColor Black -NoNewline
     write-host " ]|!" -ForegroundColor Red -BackgroundColor Black -NoNewline
-}
-
+}##END##########################UI#TextBar###
 function Menu()
 {
     write-host "[1] Activate Song Pack`n[2] Remove ALL Song Packs`n[3] Generate a Songs List for a Pack`n[4] Generate a Packs List" -ForegroundColor Green -BackgroundColor Black
@@ -222,4 +212,4 @@ function Menu()
         3{Get-PackSongsList}
         4{Get-SongPacksList}
     }
-}
+}##END###########################UI#Menu###
