@@ -1,0 +1,4 @@
+[{"Name":"Enact the Ending","Artist":"Thousand Sun Sky","Album":"Single","Genre":"Melodic Metal","Charter":"EvaCH","Year":"2019","Playlist":"Clone Hero","lyrics":false,"modchart":false,"songlength":255203,"chartsAvailable":824836030719},
+{"Name":"X","Artist":"System of a Down","Album":"Toxicity","Genre":"Nu-Metal","Charter":"bernie","Year":"2001","Playlist":"system of a down","lyrics":true,"modchart":false,"songlength":125723,"chartsAvailable":1031043809535},
+{"Name":"Toxicity","Artist":"System of a Down","Album":"Toxicity","Genre":"Nu Metal","Charter":"Harmonix","Year":"2002","Playlist":"system of a down","lyrics":true,"modchart":false,"songlength":229044,"chartsAvailable":1031043809535},
+]

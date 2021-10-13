@@ -1,0 +1,34 @@
+PACKAGE :: KEYWORD :: PATH
+========================================
+Rock Band :: RB :: .\SONGS\Rock Band\
+Guitar Hero :: GH :: .\SONGS\Guitar Hero\
+Band Hero :: BH :: .\SONGS\Band Hero\
+Custom Charts :: CC :: .\SONGS\Custom Charted\
+Full Albums :: FA :: .\SONGS\Full Albums\
+
+
+####################
+### SUB-PACKAGES ###
+####################
+
+Rock Band 1 :: RB1 :: .\SONGS\RockBand\Rock Band 1 (+DLC)\
+Rock Band 2 :: RB2 :: .\SONGS\RockBand\Rock Band 2 (+DLC)\
+Rock Band 3 :: RB3 :: .\SONGS\RockBand\Rock Band 3 (+DLC)\
+Rock Band 4 :: RB4 :: .\SONGS\RockBand\Rock Band 4 (+DLC)\
+Rock Band Blitz :: RBBlitz :: .\SONGS\RockBand\Rock Band Blitz\
+Rock Band Network :: RBN :: .\SONGS\RockBand\Rock Band Network\
+Lego Rock Band :: LegoRB :: .\SONGS\RockBand\Lego Rock Band\
+Greenday Rock Band :: GreendayRB :: .\SONGS\RockBand\Greenday Rock Band\
+The Beatles Rock Band :: BeatlesRB :: .\SONGS\RockBand\The Beatles Rock Band\
+ACDC Rock Band :: ACDCRB :: .\SONGS\RockBand\Rock Band ACDC\
+
+Guitar Hero - Smash Hits :: GHSmashHits :: .\SONGS\GuitarHero\Guitar Hero - Smash Hits\
+Guitar Hero 5 :: GH5 :: .\SONGS\GuitarHero\Guitar Hero 5\
+Guitar Hero Live :: GHLive :: .\SONGS\GuitarHero\Guitar Hero Live\
+Guitar Hero On Tour :: GHOT :: .\SONGS\GuitarHero\Guitar Hero On Tour\
+Guitar Hero On Tour - Modern Hits :: GHModernHits :: .\SONGS\GuitarHero\Guitar Hero On Tour - Modern Hits\
+Guitar Hero On Tour Decades :: GHDecades :: .\SONGS\GuitarHero\Guitar Hero On Tour Decades\
+Guitar Hero Van Halen :: GHVH :: .\SONGS\GuitarHero\Guitar Hero Van Halen\
+Guitar Hero Warriors of Rock :: GHWoR :: .\SONGS\GuitarHero\Guitar Hero Warriors of Rock\
+Guitar Hero Warriors of Rock DLC :: GHWoRDLC :: .\SONGS\GuitarHero\Guitar Hero WoR DLC\
+Guitar Hero World Tour :: GHWorldTour :: .\SONGS\GuitarHero\Guitar Hero World Tour\

@@ -1,0 +1,14 @@
+####################
+## SONG DATA INFO ##
+####################
+ID, ARTIST, SONG TITLE, FILEPATH, FILESIZE
+
+Example:
+---------------------------
+0001, 3 Doors Down, When I'm Gone, .\SONGS\Band Hero\3 Doors Down - When I'm Gone\, 37.4mb
+
+ID =		0001
+ARTIST =	3 Doors Down
+SONG TITLE =	When I'm Gone
+FILEPATH =	.\SONGS\Band Hero\3 Doors Down - When I'm Gone\
+FILESIZE =	37.4mb
