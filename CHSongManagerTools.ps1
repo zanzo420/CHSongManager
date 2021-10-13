@@ -112,6 +112,7 @@ function RemoveAllSongPacks()
 
 function Get-PackSongsList()
 {
+    $WorkingDir = "$($PWD)"
     ShowBanner
     Write-Host "Current Working Directory: " -ForegroundColor Green -NoNewline #-BackgroundColor Black
     write-host $WorkingDir #-BackgroundColor Black
@@ -133,12 +134,13 @@ function Get-PackSongsList()
     }
     #get total number of songs in the pack...
     $numSongs = ls -directory -name
+    $nCount = $numSongs.Count
     $numSongs.Count | out-file "count.txt"
     $dirName = Split-Path $WorkingDir -Leaf
     write-host "|[$($dirName)]|" -ForegroundColor Red -BackgroundColor Black -NoNewline
     write-host " Song List Generation Complete..."
     write-host "# of Songs: " -BackgroundColor Black -NoNewline
-    write-host $numSongs.Count -ForegroundColor Green -BackgroundColor Black
+    write-host "$($nCount)" -ForegroundColor Green -BackgroundColor Black
     cd ..
     pause
 
