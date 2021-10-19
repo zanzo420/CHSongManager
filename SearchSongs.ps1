@@ -6,7 +6,7 @@ $songsfound,$input = ""
 ##########################################
 ## ALIASES #################################
 Set-Alias -Name SS -Value SongSearch -Description "Search for a Song or Artist from your Clone Hero Songs List"
-Set-Alias -Name SJ -Value SearchJson -Description "Search for a Song or Artist from your Clone Hero Songs List"
+#Set-Alias -Name SJ -Value SearchJson -Description "Search for a Song or Artist from your Clone Hero Songs List"
 ##########################################
 
 function CHSM()
@@ -59,7 +59,7 @@ function SearchJson()
     $songsfound = Get-Content "G:\.CloneHero\Songs\songsFound.txt"
     out-file "G:\.CloneHero\Songs\~SearchResults~\$($input).json" -InputObject $songsfound -Force
     #$songsfound | format-list | out-host
-    write-host "$(CHSM) Search found " -BackgroundColor Black -NoNewline
+    write-host "Search found " -BackgroundColor Black -NoNewline
     write-host $songsfound.Count -ForegroundColor Red -BackgroundColor Black -NoNewline
     write-host " results, out of " -BackgroundColor Black -NoNewline
     write-host $SongsList.Count -ForegroundColor Red -BackgroundColor Black -NoNewline
@@ -71,8 +71,8 @@ function SearchJson()
     #########################
 }
 
-function SongSearch(){
-    Param($Find)
+function SongSearch([string]$Find)
+{
     if($Find -eq $null){$input = Read-Host "Enter the name of an artist or song name to search for..."}
     else{$input = $Find}
 
@@ -99,7 +99,7 @@ function SongSearch(){
     $fixInput = Replace-SpecialChars -InputString $input
     out-file "G:\.CloneHero\Songs\~SearchResults~\$($fixInput).txt" -InputObject $songsfound -Force
     #$songsfound | format-list | out-host
-    write-host "$(CHSM) Search found " -BackgroundColor Black -NoNewline
+    write-host "Search found " -BackgroundColor Black -NoNewline
     write-host $songsfound.Count -ForegroundColor Red -BackgroundColor Black -NoNewline
     write-host " results, out of " -BackgroundColor Black -NoNewline
     write-host $SongsList.Count -ForegroundColor Red -BackgroundColor Black -NoNewline

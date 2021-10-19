@@ -66,7 +66,7 @@ function RemoveAllSongPacks()
     $actPackList | format-list | Out-Host
     write-host "$actPackList" -BackgroundColor Black -ForegroundColor Magenta
     write-host "$($CHSongsDIR)\activepacks.txt" -BackgroundColor Black -ForegroundColor Yellow
-    ForEach($actPack in $activePacks)
+    ForEach($actPack in $activePks)
     {
        $packSongs = Get-Content "$($CHSongsDIR)\$($actPack)\activesongs.txt"
        $packSongs | format-list | out-host
@@ -112,19 +112,22 @@ function Get-PackSongsList()
     write-host $WorkingDir #-BackgroundColor Black
     pause
     
-    $Folders = Get-ChildItem "$($PWD)" -Directory -Name #| Select-Object -Property PSPath | Export-Csv "songs.csv"
+    $Folders = Get-ChildItem "$($PWD)" -Directory -Name -Recurse #| Select-Object -Property PSPath | Export-Csv "songs.csv"
     ForEach($Folder in $Folders)
     {
-        Write-Host "Adding $($Folder) to CSV file..."
+        Write-Host "Adding " -NoNewline
+        write-host $Folder -ForegroundColor Green -NoNewline
+        write-host " to CSV file..."
         $fTemp = $Folder
         #$fTmp = $Folder
         $fParent = $fTemp | Split-Path -Resolve -Parent
         $fFile = $fTemp | Split-Path -Resolve -Leaf
         $path2Song = $Folder | Select-Object -Property PSChildName, PSParentPath, PSPath
         $pathSong = "$($fParent)\$($fFile)"
+        #$pathSong = "$($fFile)"
         #write-host "..\$($fParent)\$($fFile)" | out-file packsongs.txt -Append
         out-file -InputObject $pathSong -FilePath packsongs.txt -Append
-        Export-Csv -InputObject "$($path2Song.ToString())" - -Path "songs.csv" -Append -NoTypeInformation
+        $path2Song | Export-Csv -Path "songs.csv" -Append -NoTypeInformation
     }
     #get total number of songs in the pack...
     $numSongs = ls -directory -name
@@ -173,17 +176,139 @@ function Get-SongPacksList()
     pause
 }##END##########Get-SongPacksList##
 
+function ConvertBStoCH()
+{
+$dirBase = 'G:\.CloneHero\Songs\BeatSaber'
+$dirOutput = 'G:\.CloneHero\Songs\BeatSaber\CloneHero Charts'
+$Folders,$Files,$Name = $null
+$count = 0
+# Gets the Name and Count of all .zip files.
+$Files = Get-ChildItem "$($dirBase)" -File -Name -Include *.zip -Recurse
+$numFiles = $Files.Count
+Write-Host '||[ ' -ForegroundColor DarkRed -NoNewline
+Write-Host 'Songs Found: ' -ForegroundColor Red -NoNewline
+Write-Host $numFiles -ForegroundColor Green -NoNewline # song count display
+Write-Host ' ]||' -ForegroundColor DarkRed
+Write-Host "---=============---=============---" -ForegroundColor DarkRed
+Pause
+foreach($File in $Files)
+ {
+     Write-Host "Converting: " -NoNewline
+     Write-Host $File -ForegroundColor DarkGreen -NoNewline
+     write-host " to Clone Hero..."
+     #Run Spleeter on all .mp3 files found.
+     #write-host "$($dirBase)\$($File)"
+     BSChartConv "$($dirBase)\$($File)"
+     Out-File -FilePath "SongsConverted.txt" -Append -InputObject $File
+             
+     $File = Split-Path -Path $File -Leaf
+     Write-Host "Finished converting chart for " -ForegroundColor Red -NoNewline
+     Write-Host "$File"
+     #Out-File -FilePath "$dirOutput\\$Name_StemsRipped.txt" -Append -InputObject $File
+ }
+write-host "Successfully converted $($numFiles) Beat Saber chart(s) to Clone Hero!"
+}###########################END##ConvertBStoCH###
+
+function SongsDB()
+{
+    $tmpSongs = $SongsDIR
+    $tmpSongs2 = $CHSongsDIR
+    $exPath = "$($tmpSongs)\~ActiveSongs~"
+
+    $getSongs = Get-ChildItem "$($tmpSongs)" -Directory -Name -Recurse
+    ForEach($sng in $getSongs)
+    {
+        write-host $sng -ForegroundColor Green
+        out-file "$($tmpSongs)\allsongs.txt" -InputObject $sng -Append
+    }
+    dPause('AFTER $getSongs, its Value is...')
+    #write-host $getSongs
+    write-host "##########################" -ForegroundColor Red -BackgroundColor Black
+    write-host "GENERATING SONGS DATABASE FILE..." -ForegroundColor DarkRed -BackgroundColor Black
+    write-host "##########################" -ForegroundColor Red -BackgroundColor Black
+    pause
+    $SongLists = Get-ChildItem $tmpSongs -File -Exclude $($exPath)* -Include *packsongs.txt -Recurse
+    write-host $SongLists -ForegroundColor Magenta -BackgroundColor Black
+    pause
+    ForEach($songlist in $SongLists)
+    {
+        write-host "Reading $($songlist) songs list file..." -ForegroundColor Yellow
+        pause
+        $songlistSongs = Get-Content $songlist
+        $sSplit = Split-String -InputString $songlistSongs -Separator "`n"
+        write-host $sSplit[0] -ForegroundColor Cyan
+        pause
+        $sCount = 0
+        ForEach($songlistSong in $songlistSongs)
+        {
+            write-host "[$($listName)]" -ForegroundColor DarkYellow -BackgroundColor Black -NoNewline
+            write-host "$($sSplit[$sCount])" -ForegroundColor Yellow
+            
+            #write-host "[Song List: " -ForegroundColor Red -NoNewline
+            #write-host "$($songlist)" -NoNewline
+            #write-host "]" -ForegroundColor Red
+            #write-host "Adding " -NoNewline
+            #write-host "$($songlistSong)" -ForegroundColor Green -NoNewline
+            #write-host " to SongsDB file..." -NoNewline
+            write-host "`n$($sName)`n"
+            Out-File -FilePath "$($SongsDIR)\songsdb.txt" -Append -InputObject $sSplit[$sCount]
+            $sCount++
+        }
+        dPause('AFTER $songlistSongs LOOP')
+        write-host "[SongsDB] " -ForegroundColor Red -NoNewline
+        write-host "Adding $($songlist) to the SongsDB lists file..."
+        Out-File -FilePath "$($SongsDIR)\songsdblists.txt" -Append -InputObject $songlist
+    }
+    write-host "#############################" -ForegroundColor Green -BackgroundColor Black
+    write-host "FINISHED GENERATING SONGS DATABASE" -ForegroundColor DarkGreen -BackgroundColor Black
+    write-host "#############################" -ForegroundColor Green -BackgroundColor Black
+    pause
+}
+
+function SongExists()
+{
+    $tmpSongs = $SongsDIR
+    $tmpSongs2 = $CHSongsDIR
+
+    $getSongs = Get-ChildItem "$($tmpSongs)" -Directory -Name -Recurse
+    #$getCHSongs = Get-ChildItem "$($tmpSongs2)" -Directory -Name -Recurse
+
+    
+    
+    $Folders = Get-ChildItem "$($PWD)" -Directory -Name #| Select-Object -Property PSPath | Export-Csv "songs.csv"
+    ForEach($Folder in $Folders)
+    {
+        Write-Host "Adding " -NoNewline
+        write-host $Folder -ForegroundColor Green -NoNewline
+        write-host " to CSV file..."
+        $fTemp = $Folder
+        #$fTmp = $Folder
+        $fParent = $fTemp | Split-Path -Resolve -Parent
+        $fFile = $fTemp | Split-Path -Resolve -Leaf
+        $path2Song = $Folder | Select-Object -Property PSChildName, PSParentPath, PSPath
+        $pathSong = "$($fParent)\$($fFile)"
+        #write-host "..\$($fParent)\$($fFile)" | out-file packsongs.txt -Append
+        out-file -InputObject $pathSong -FilePath packsongs.txt -Append
+        $path2Song | Export-Csv -Path "songs.csv" -Append -NoTypeInformation
+    }
+}
+
 
 #####################################
 ### UI FUNCTIONS ########################
 function ShowBanner()
 {
     write-host ""
-    write-host '||[ ' -ForegroundColor Red -NoNewline #-BackgroundColor Black
-    write-host 'CH Song Manager' -ForegroundColor DarkRed -NoNewline #-BackgroundColor Black
-    write-host ' ]||' -ForegroundColor Red #-BackgroundColor Black
-    write-host "          by Zanzo          `n" -ForegroundColor DarkRed #-BackgroundColor Black
+    #write-host "  _______________" -ForegroundColor Red
+    write-host '||[ ' -ForegroundColor Red -NoNewline -BackgroundColor Black
+    write-host 'CH Song Manager' -ForegroundColor DarkRed -NoNewline -BackgroundColor Black
+    write-host ' ]||' -ForegroundColor Red -BackgroundColor Black
+    #write-host "  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯" -ForegroundColor Red
+    write-host "          " -NoNewline
+    write-host 'by ȤāŋƶØ' -ForegroundColor DarkRed -BackgroundColor Black -NoNewline
+    write-host "         " -ForegroundColor DarkRed
 }##END#######################UI#ShowBanner###
+
 function PrintSong($artist, $name, $album)
 {
     write-host "$($artist) " -ForegroundColor DarkRed -BackgroundColor Black -NoNewline
@@ -193,13 +318,174 @@ function PrintSong($artist, $name, $album)
     write-host "$($album)" -BackgroundColor Black -NoNewline
     write-host ")" -ForegroundColor Red -BackgroundColor Black -NoNewline
 }##END#########################UI#PrintSong###
-function TextBar($txt)
+
+function uiTextBlock($txt)
+{
+    write-host "[" -NoNewline -ForegroundColor Red #-BackgroundColor Black
+    write-host "$($txt)" -NoNewline -ForegroundColor DarkRed #-BackgroundColor Black
+    write-host $($txt) -NoNewline
+    write-host " ***" -NoNewline -ForegroundColor Red #-BackgroundColor Black
+}
+function uiTextNote($txt)
+{
+    write-host "*** NOTE: " -NoNewline -ForegroundColor Cyan #-BackgroundColor Black
+    write-host $($txt) -NoNewline -ForegroundColor DarkCyan
+    write-host " ***" -NoNewline -ForegroundColor Cyan #-BackgroundColor Black
+}##END########################UI#TextNote###
+function uiTextBlock([string]$txt,[int]$style)
+{
+    if($style -eq 1)
+    { # Red/Default
+        write-host "!|[ " -NoNewline -ForegroundColor Red -BackgroundColor Black
+        write-host $($txt) -NoNewline -BackgroundColor Black
+        write-host " ]|!" -NoNewline -ForegroundColor Red -BackgroundColor Black
+    }elseif($style -eq 2)
+    { # Red/DarkRed
+        write-host "!|[ " -ForegroundColor Red -BackgroundColor Black -NoNewline
+        write-host $($txt) -ForegroundColor DarkRed -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor Red -BackgroundColor Black -NoNewline
+    }elseif($style -eq 3)
+    { # Green/Default
+        write-host "!|[ " -ForegroundColor Green -BackgroundColor Black -NoNewline
+        write-host $($txt) -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor Green -BackgroundColor Black -NoNewline
+    }elseif($style -eq 4)
+    { # Green/DarkGreen
+        write-host "!|[ " -ForegroundColor Green -BackgroundColor Black -NoNewline
+        write-host $($txt) -ForegroundColor DarkGreen -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor Green -BackgroundColor Black -NoNewline
+    }elseif($style -eq 5)
+    { # Blue/Default
+        write-host "!|[ " -ForegroundColor Blue -BackgroundColor Black -NoNewline
+        write-host $($txt) -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor Blue -BackgroundColor Black -NoNewline
+    }elseif($style -eq 6)
+    { # Blue/DarkBlue
+        write-host "!|[ " -ForegroundColor Blue -BackgroundColor Black -NoNewline
+        write-host $($txt) -ForegroundColor DarkBlue -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor Blue -BackgroundColor Black -NoNewline
+    }elseif($style -eq 7)
+    { # Yellow/Default
+        write-host "!|[ " -ForegroundColor Yellow -BackgroundColor Black -NoNewline
+        write-host $($txt) -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor Yellow -BackgroundColor Black -NoNewline
+    }elseif($style -eq 8)
+    { # Yellow/DarkYellow
+        write-host "!|[ " -ForegroundColor Yellow -BackgroundColor Black -NoNewline
+        write-host $($txt) -ForegroundColor DarkYellow -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor Yellow -BackgroundColor Black -NoNewline
+    }elseif($style -eq 9)
+    { # Magenta/Default
+        write-host "!|[ " -ForegroundColor Magenta -BackgroundColor Black -NoNewline
+        write-host $($txt) -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor Magenta -BackgroundColor Black -NoNewline
+    }elseif($style -eq 10)
+    { # Cyan/DarkMagenta
+        write-host "!|[ " -ForegroundColor Magenta -BackgroundColor Black -NoNewline
+        write-host $($txt) -ForegroundColor DarkMagenta -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor Magenta -BackgroundColor Black -NoNewline
+    }elseif($style -eq 11)
+    { # Cyan/Default
+        write-host "!|[ " -ForegroundColor Cyan -BackgroundColor Black -NoNewline
+        write-host $($txt) -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor Cyan -BackgroundColor Black -NoNewline
+    }elseif($style -eq 12)
+    { # Cyan/DarkCyan
+        write-host "!|[ " -ForegroundColor Cyan -BackgroundColor Black -NoNewline
+        write-host $($txt) -ForegroundColor DarkCyan -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor Cyan -BackgroundColor Black -NoNewline
+    }elseif($style -eq 13)
+    { # Gray/Default
+        write-host "!|[ " -ForegroundColor Gray -BackgroundColor Black -NoNewline
+        write-host $($txt) -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor Gray -BackgroundColor Black -NoNewline
+    }elseif($style -eq 14)
+    { # Gray/DarkGray
+        write-host "!|[ " -ForegroundColor Gray -BackgroundColor Black -NoNewline
+        write-host $($txt) -ForegroundColor DarkGray -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor Gray -BackgroundColor Black -NoNewline
+    }elseif($style -eq 15)
+    { # White/Default
+        write-host "!|[ " -ForegroundColor White -BackgroundColor Black -NoNewline
+        write-host $($txt) -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor White -BackgroundColor Black -NoNewline
+    }elseif($style -eq 16)
+    { # White/Gray
+        write-host "!|[ " -ForegroundColor White -BackgroundColor Black -NoNewline
+        write-host $($txt) -ForegroundColor Gray -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor White -BackgroundColor Black -NoNewline
+    }elseif($style -eq 0)
+    {# Black/White
+        write-host "!|[ " -ForegroundColor Black -BackgroundColor White -NoNewline
+        write-host $($txt) -ForegroundColor Black -BackgroundColor White -NoNewline
+        write-host " ]|!" -ForegroundColor Black -BackgroundColor White -NoNewline
+    }
+    else #DEFAULT
+    { # Red/Default
+        write-host "!|[ " -ForegroundColor White -BackgroundColor Black -NoNewline
+        write-host $($txt) -ForegroundColor Gray -BackgroundColor Black -NoNewline
+        write-host " ]|!" -ForegroundColor White -BackgroundColor Black -NoNewline  
+    }
+}##END########################UI#TextBarRed###
+function uiTextBar_Red($txt)
 {
     write-host "!|[ " -ForegroundColor Red -BackgroundColor Black -NoNewline
-    write-host $txt -ForegroundColor DarkRed -BackgroundColor Black -NoNewline
+    write-host $($txt) -ForegroundColor DarkRed -BackgroundColor Black -NoNewline
     write-host " ]|!" -ForegroundColor Red -BackgroundColor Black -NoNewline
-}##END##########################UI#TextBar###
-function Menu()
+}##END########################UI#TextBarRed###
+function uiTextBar_Alert($txt)
+{
+    write-host "!|[ " -NoNewline -ForegroundColor Yellow -BackgroundColor Black
+    write-host $($txt) -NoNewline -ForegroundColor DarkYellow -BackgroundColor Black
+    write-host " ]|!" -NoNewline -ForegroundColor Yellow -BackgroundColor Black
+}##END########################UI#uiTextNote_Error###
+function uiTextBar([string]$txt,[string]$type) #red
+{
+    if($($type -eq "Alert") -or $($type -eq "alert") -or $($type -eq "a") -or $($type -eq "A") -or $($type -eq "1"))
+    {
+        write-host "!|[ ALERT: " -NoNewline -ForegroundColor Yellow -BackgroundColor Black
+        write-host $($txt) -NoNewline -ForegroundColor DarkYellow -BackgroundColor Black
+        write-host " ]|!" -NoNewline -ForegroundColor Yellow -BackgroundColor Black   
+    }elseif($($type -eq "Error") -or $($type -eq "error") -or $($type -eq "E") -or $($type -eq "e") -or $($type -eq "2"))
+    {
+        write-host "!|[ ERROR: " -NoNewline -ForegroundColor Red -BackgroundColor Black
+        write-host $($txt) -NoNewline -ForegroundColor DarkRed -BackgroundColor Black
+        write-host " ]|!" -NoNewline -ForegroundColor Red -BackgroundColor Black
+    }elseif($($type -eq "Info") -or $($type -eq "info") -or $($type -eq "I") -or $($type -eq "i") -or $($type -eq "3"))
+    {
+        write-host "!|[ INFO: " -NoNewline -ForegroundColor Cyan -BackgroundColor Black
+        write-host $($txt) -NoNewline -ForegroundColor DarkCyan -BackgroundColor Black
+        write-host " ]|!" -NoNewline -ForegroundColor Cyan -BackgroundColor Black
+    }elseif($($type -eq "Note") -or $($type -eq "note") -or $($type -eq "N") -or $($type -eq "n") -or $($type -eq "0"))
+    {
+        write-host "!|[ NOTE: " -NoNewline -ForegroundColor Gray -BackgroundColor Black
+        write-host $($txt) -NoNewline -ForegroundColor DarkGray -BackgroundColor Black
+        write-host " ]|!" -NoNewline -ForegroundColor Gray -BackgroundColor Black
+    }elseif($($type -eq "Red") -or $($type -eq "red") -or $($type -eq "R") -or $($type -eq "r") -or $($type -eq "4"))
+    {
+        write-host "!|[ " -NoNewline -ForegroundColor Red -BackgroundColor Black
+        write-host $($txt) -NoNewline -ForegroundColor DarkRed -BackgroundColor Black
+        write-host " ]|!" -NoNewline -ForegroundColor Red -BackgroundColor Black
+    }
+    else
+    {
+        write-host "!|[ " -ForegroundColor Red -BackgroundColor Black -NoNewline
+        write-host "$($type): " -NoNewline -ForegroundColor DarkRed -BackgroundColor Black
+        write-host $($txt) -NoNewline -BackgroundColor Black
+        write-host " ]|!" -NoNewline -ForegroundColor Red -BackgroundColor Black
+    }
+}##END########################UI#uiTextError###
+
+function uiDisplaySong([string]$sngArtist,[string]$sngName,[string]$sngAlbum,[int]$sngYear)
+{
+    write-host "" -ForegroundColor Red -BackgroundColor Black -NoNewline
+}
+
+function uiJsonSong([string]$sngName,[string]$sngArtist,[string]$sngAlbum,[string]$sngGenre,[string]$sngCharter,[string]$sngYear,[string]$sngPlaylist,[bool]$sngLyrics,[bool]$sngMod,[int]$sngLength,[int]$sngCA)
+{
+    
+}
+function CHSM_Menu()
 {
     write-host "[1] Activate Song Pack`n[2] Remove ALL Song Packs`n[3] Generate a Songs List for a Pack`n[4] Generate a Packs List" -ForegroundColor Green -BackgroundColor Black
     write-host "NOTE: You must run options [2] or [3] from the Packs folder." -ForegroundColor DarkGreen -BackgroundColor Black
@@ -211,5 +497,12 @@ function Menu()
         2{RemoveAllSongPacks}
         3{Get-PackSongsList}
         4{Get-SongPacksList}
+        5{ConvertBStoCH}
     }
 }##END###########################UI#Menu###
+
+function dPause([string]$txt)
+{
+    write-host "`n!|[ $($txt) ]|!" -ForegroundColor Yellow -BackgroundColor Black
+    pause
+}
