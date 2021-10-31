@@ -6,8 +6,6 @@ $SettingsFile = Get-Content "$($PSScriptRoot)\settings.txt"
 $SongsDIR = "$($SettingsFile[0])" #| out-host
 $CHSongsDIR = "$($SettingsFile[1])" #| out-host
 $activePacks = Get-Content "$($SettingsFile[2])" #| out-host
-# Scrobbler
-$Scrobbler = 'C:\Users\Zanzo\AppData\Roaming\Clone Hero Launcher\gameFiles\CHScrobbler.exe'
 #####################################
 
 
@@ -626,14 +624,6 @@ function dPause([string]$txt)
 }##END###############################NowPlaying####
 ################################################
 #>
-function RemoveSongDupes()
-{
-    #search for this line to find start of duplicate songs...
-    #ERROR: These folders contain charts that another song has (duplicate charts)!
-
-    #regex for file to remove path...
-    # [^)]*
-}
 
 ################################################
 ## Wait-FileChange FUNCTION ###########################
@@ -641,7 +631,7 @@ $waitFile = "C:\Users\Zanzo\AppData\Roaming\Clone Hero Launcher\gameFiles\curren
 $waitAction = { write-host "$(D:\.repos\.CloneHero\CHSongManager\NowPlaying.ps1)"}
 $global:FileChanged = $false
 function Wait-FileChange {
-    param( [string]$File = $waitFile, [string]$Action = $waitAction ) 
+    param( [string]$File, [string]$Action ) 
 
     ## VARIABLES ####################
     $waitFile = "C:\Users\Zanzo\AppData\Roaming\Clone Hero Launcher\gameFiles\currentsong.txt" # The file to watch
